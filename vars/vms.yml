@@ -1,43 +1,102 @@
 vms:
-  - name: "fw-it-dmz"
-    cpu: 2
-    ram_mb: 2048
-    type: "qcow2"
-    base_image: "/var/lib/libvirt/images/base/debian-cloud.qcow2"
-    networks:
-      - "it"
-      - "dmz"
+    - name: "fw-it-dmz"
+      role: "firewall"
+      zone: "it-dmz"
+      cpu: 2
+      ram_mb: 2048
+      disk_gb: 20
+      type: "qcow2"
+      base_image: "images/debian-genericcloud.qcow2"
+      networks:
+          - "it"
+          - "dmz"
 
-  - name: "fw-dmz-otl3"
-    cpu: 2
-    ram_mb: 2048
-    type: "qcow2"
-    base_image: "/var/lib/libvirt/images/base/debian-cloud.qcow2"
-    networks:
-      - "dmz"
-      - "otl3"
+    - name: "fw-dmz-otl3"
+      role: "firewall"
+      zone: "dmz-otl3"
+      cpu: 2
+      ram_mb: 2048
+      disk_gb: 20
+      type: "qcow2"
+      base_image: "images/debian-genericcloud.qcow2"
+      networks:
+          - "dmz"
+          - "otl3"
 
-  - name: "fw-otl3-otl2"
-    cpu: 2
-    ram_mb: 2048
-    type: "qcow2"
-    base_image: "/var/lib/libvirt/images/base/debian-cloud.qcow2"
-    networks:
-      - "otl3"
-      - "otl2"
+    - name: "fw-otl3-otl2"
+      role: "firewall"
+      zone: "otl3-otl2"
+      cpu: 2
+      ram_mb: 2048
+      disk_gb: 20
+      type: "qcow2"
+      base_image: "images/debian-genericcloud.qcow2"
+      networks:
+          - "otl3"
+          - "otl2"
 
-  - name: "siem-ids"
-    cpu: 4
-    ram_mb: 4096
-    type: "qcow2"
-    base_image: "/var/lib/libvirt/images/base/debian-cloud.qcow2"
-    networks:
-      - "dmz"
+    - name: "siem-ids"
+      role: "siem"
+      zone: "dmz"
+      cpu: 4
+      ram_mb: 4096
+      disk_gb: 40
+      type: "qcow2"
+      base_image: "images/debian-genericcloud.qcow2"
+      networks:
+          - "dmz"
 
-  - name: "dc"
-    cpu: 4
-    ram_mb: 8192
-    type: "iso"
-    base_image: "/var/lib/libvirt/isos/windows-server-2022.iso"
-    networks:
-      - "it"
+    - name: "dc"
+      role: "ad_dc"
+      zone: "it"
+      cpu: 4
+      ram_mb: 8192
+      disk_gb: 60
+      type: "iso"
+      base_image: "iso/windows-server-2022.iso"
+      networks:
+          - "it"
+
+    - name: "client-ad"
+      role: "ad-client"
+      zone: "it"
+      cpu: 2
+      ram_mb: 4096
+      disk_gb: 40
+      type: "qcow2"
+      base_image: "images/debian-genericcloud.qcow2"
+      networks:
+          - "it"
+
+    - name: "bastion"
+      role: "bastion"
+      zone: "dmz"
+      cpu: 2
+      ram_mb: 2048
+      disk_gb: 20
+      type: "qcow2"
+      base_image: "images/debian-genericcloud.qcow2"
+      networks:
+          - "dmz"
+
+    - name: "scada"
+      role: "scada"
+      zone: "otl3"
+      cpu: 4
+      ram_mb: 4096
+      disk_gb: 40
+      type: "qcow2"
+      base_image: "images/debian-genericcloud.qcow2"
+      networks:
+          - "otl3"
+
+    - name: "plc"
+      role: "plc"
+      zone: "otl2"
+      cpu: 2
+      ram_mb: 2048
+      disk_gb: 20
+      type: "qcow2"
+      base_image: "images/debian-genericcloud.qcow2"
+      networks:
+          - "otl2"
