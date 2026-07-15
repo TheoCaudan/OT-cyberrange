@@ -1,0 +1,32 @@
+---
+- name: "Define libvirt networks"
+  ansible.builtin.template:
+    src: "networks.xml.j2"
+    dest: "/tmp/{{ item.name }}.xml"
+    mode: "0644"
+  loop: "{{ networks }}"
+
+- name: "Create libvirt networks"
+  community.libvirt.virt_net:
+    command: define
+    name: "{{ item.name }}"
+    xml: "{{ lookup('template', 'networks.xml.j2') }}"
+    uri: "{{ libvirt_uri }}"
+  loop: "{{ networks }}"
+  register: network_define_result
+
+- name: "Start libvirt networks"
+  community.libvirt.virt_net:
+    command: create
+    name: "{{ item.name }}"
+    uri: "{{ libvirt_uri }}"
+  loop: "{{ networks }}"
+  when: item.autostart | default(true)
+
+- name: "Set libvirt networks to autostart"
+  community.libvirt.virt_net:
+    command: autostart
+    name: "{{ item.name }}"
+    uri: "{{ libvirt_uri }}"
+  loop: "{{ networks }}"
+  when: item.autostart | default(true)

@@ -1,0 +1,43 @@
+vms:
+  - name: "fw-it-dmz"
+    cpu: 2
+    ram_mb: 2048
+    type: "qcow2"
+    base_image: "/var/lib/libvirt/images/base/debian-cloud.qcow2"
+    networks:
+      - "it"
+      - "dmz"
+
+  - name: "fw-dmz-otl3"
+    cpu: 2
+    ram_mb: 2048
+    type: "qcow2"
+    base_image: "/var/lib/libvirt/images/base/debian-cloud.qcow2"
+    networks:
+      - "dmz"
+      - "otl3"
+
+  - name: "fw-otl3-otl2"
+    cpu: 2
+    ram_mb: 2048
+    type: "qcow2"
+    base_image: "/var/lib/libvirt/images/base/debian-cloud.qcow2"
+    networks:
+      - "otl3"
+      - "otl2"
+
+  - name: "siem-ids"
+    cpu: 4
+    ram_mb: 4096
+    type: "qcow2"
+    base_image: "/var/lib/libvirt/images/base/debian-cloud.qcow2"
+    networks:
+      - "dmz"
+
+  - name: "dc"
+    cpu: 4
+    ram_mb: 8192
+    type: "iso"
+    base_image: "/var/lib/libvirt/isos/windows-server-2022.iso"
+    networks:
+      - "it"

@@ -1,0 +1,26 @@
+<domain type='kvm'>
+  <name>{{ item.name }}</name>
+  <memory unit='MiB'>{{ item.ram_mb }}</memory>
+  <vcpu>{{ item.cpu }}</vcpu>
+
+  <os>
+    <type arch='x86_64' machine='pc'>hvm</type>
+  </os>
+
+  <devices>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2'/>
+      <source file='/var/lib/libvirt/images/{{ item.name }}/{{ item.name }}.qcow2'/>
+      <target dev='vda' bus='virtio'/>
+    </disk>
+
+    {% for net in item.networks %}
+    <interface type='network'>
+      <source network='{{ net }}'/>
+      <model type='virtio'/>
+    </interface>
+    {% endfor %}
+
+    <graphics type='vnc' port='-1' autoport='yes'/>
+  </devices>
+</domain>

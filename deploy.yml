@@ -1,0 +1,13 @@
+---
+- name: "Deploy OT lab"
+  hosts: localhost
+  gather_facts: true
+  become: true
+
+  vars_files:
+    - "vars/networks.yml"
+    - "vars/vms.yml"
+
+  roles:
+    - role: network
+    - role: vm
