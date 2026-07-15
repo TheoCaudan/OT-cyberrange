@@ -70,7 +70,7 @@ ot-lab/
 
 1. Cloner le dépôt
 git clone git@github.com:TheoCaudan/OT-cyberrange.git
-cd ot-cyberrange
+cd OT-cyberrange
 
 2. Vérifier les médias
 Placer les fichiers dans :
@@ -86,7 +86,7 @@ Adapter si besoin :
 - inventory/lab.yml
 
 4. Lancer le déploiement
-ansible-playbook -i inventory/lab.yml deploy.yml
+ansible-playbook -i inventory/lab.yml deploy.yml -K
 
 ## Ajout ou modification de configuration
 
