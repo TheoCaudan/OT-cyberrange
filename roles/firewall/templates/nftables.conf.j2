@@ -1,0 +1,36 @@
+flush ruleset
+
+table inet filter {
+    chain input {
+        type filter hook input priority 0; policy {{ firewall_nft_input_policy }};
+
+        iif "lo" accept
+        ct state established,related accept
+
+        {% for port in firewall_allowed_tcp_ports %}
+        tcp dport {{ port }} accept
+        {% endfor %}
+
+        {% for port in firewall_allowed_udp_ports %}
+        udp dport {{ port }} accept
+        {% endfor %}
+    }
+
+    chain forward {
+        type filter hook forward priority 0; policy {{ firewall_nft_forward_policy }};
+
+        ct state established,related accept
+
+        {% for rule in firewall_allowed_forward_rules %}
+        {% if rule.proto == "tcp" %}
+        iif "{{ rule.iif }}" oif "{{ rule.oif }}" tcp dport {{ rule.dport }} accept comment "{{ rule.name }}"
+        {% elif rule.proto == "udp" %}
+        iif "{{ rule.iif }}" oif "{{ rule.oif }}" udp dport {{ rule.dport }} accept comment "{{ rule.name }}"
+        {% endif %}
+        {% endfor %}
+    }
+
+    chain output {
+        type filter hook output priority 0; policy {{ firewall_nft_output_policy }};
+    }
+}
