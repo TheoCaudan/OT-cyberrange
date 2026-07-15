@@ -1,4 +1,4 @@
-# /!\ UNDER CONSTRUCTION : README.md OUT-OF-DATE !! /!\
+# /!\ UNDER CONSTRUCTION : README.md OUT-OF-DATE
 
 # OT Cyber Range
 
