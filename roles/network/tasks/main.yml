@@ -1,32 +1,37 @@
 ---
-- name: "Define libvirt networks"
+- name: "Ensure libvirt network XML files directory exists"
+  ansible.builtin.file:
+      path: "/tmp/ot-lab-networks"
+      state: directory
+      mode: "0755"
+
+- name: "Render libvirt network XML definitions"
   ansible.builtin.template:
-    src: "networks.xml.j2"
-    dest: "/tmp/{{ item.name }}.xml"
-    mode: "0644"
+      src: "networks.xml.j2"
+      dest: "/tmp/ot-lab-networks/{{ item.name }}.xml"
+      mode: "0644"
   loop: "{{ networks }}"
 
-- name: "Create libvirt networks"
+- name: "Define libvirt networks"
   community.libvirt.virt_net:
-    command: define
-    name: "{{ item.name }}"
-    xml: "{{ lookup('template', 'networks.xml.j2') }}"
-    uri: "{{ libvirt_uri }}"
+      command: define
+      name: "{{ item.name }}"
+      xml: "{{ lookup('template', 'networks.xml.j2') }}"
+      uri: "{{ libvirt_uri }}"
   loop: "{{ networks }}"
-  register: network_define_result
+  when: item.name is defined
+
+- name: "Autostart libvirt networks"
+  community.libvirt.virt_net:
+      command: autostart
+      name: "{{ item.name }}"
+      uri: "{{ libvirt_uri }}"
+  loop: "{{ networks }}"
+  when: item.autostart | default(true)
 
 - name: "Start libvirt networks"
   community.libvirt.virt_net:
-    command: create
-    name: "{{ item.name }}"
-    uri: "{{ libvirt_uri }}"
+      command: create
+      name: "{{ item.name }}"
+      uri: "{{ libvirt_uri }}"
   loop: "{{ networks }}"
-  when: item.autostart | default(true)
-
-- name: "Set libvirt networks to autostart"
-  community.libvirt.virt_net:
-    command: autostart
-    name: "{{ item.name }}"
-    uri: "{{ libvirt_uri }}"
-  loop: "{{ networks }}"
-  when: item.autostart | default(true)
