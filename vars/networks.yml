@@ -1,28 +1,40 @@
 networks:
-  - name: "it"
-    bridge: "br-it"
-    gateway: "192.168.10.1"
-    netmask: "255.255.255.0"
-    forward_mode: "nat"
-    autostart: true
+    - name: "it"
+      bridge: "br-it"
+      subnet: "192.168.10.0/24"
+      gateway: "192.168.10.1"
+      netmask: "255.255.255.0"
+      dhcp: true
+      dhcp_start: "192.168.10.50"
+      dhcp_end: "192.168.10.200"
+      forward_mode: "nat"
+      autostart: true
 
-  - name: "dmz"
-    bridge: "br-dmz"
-    gateway: "192.168.20.1"
-    netmask: "255.255.255.0"
-    forward_mode: "nat"
-    autostart: true
+    - name: "dmz"
+      bridge: "br-dmz"
+      subnet: "192.168.20.0/24"
+      gateway: "192.168.20.1"
+      netmask: "255.255.255.0"
+      dhcp: true
+      dhcp_start: "192.168.20.50"
+      dhcp_end: "192.168.20.200"
+      forward_mode: "nat"
+      autostart: true
 
-  - name: "otl3"
-    bridge: "br-otl3"
-    gateway: "192.168.30.1"
-    netmask: "255.255.255.0"
-    forward_mode: "nat"
-    autostart: true
+    - name: "otl3"
+      bridge: "br-otl3"
+      subnet: "192.168.30.0/24"
+      gateway: "192.168.30.1"
+      netmask: "255.255.255.0"
+      dhcp: false
+      forward_mode: "nat"
+      autostart: true
 
-  - name: "otl2"
-    bridge: "br-otl2"
-    gateway: "192.168.40.1"
-    netmask: "255.255.255.0"
-    forward_mode: "nat"
-    autostart: true
+    - name: "otl2"
+      bridge: "br-otl2"
+      subnet: "192.168.40.0/24"
+      gateway: "192.168.40.1"
+      netmask: "255.255.255.0"
+      dhcp: false
+      forward_mode: "nat"
+      autostart: true
