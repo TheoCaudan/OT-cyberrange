@@ -45,7 +45,7 @@ ot-lab/
 - libvirt
 - Ansible
 - Python 3
-- Docker / Docker Compose si utilisés sur les VMs
+- Docker / Docker Compose
 
 ### Paquets recommandés
 - qemu-kvm
@@ -69,7 +69,7 @@ ot-lab/
 ## Installation
 
 1. Cloner le dépôt
-git clone git@github.com:USERNAME/ot-cyberrange.git
+git clone git@github.com:TheoCaudan/OT-cyberrange.git
 cd ot-cyberrange
 
 2. Vérifier les médias
