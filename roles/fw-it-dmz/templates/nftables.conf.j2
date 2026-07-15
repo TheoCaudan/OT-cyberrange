@@ -7,10 +7,6 @@ table inet filter {
         iif "lo" accept
         ct state established,related accept
 
-        tcp dport 22 accept
-        udp dport 53 accept
-        tcp dport 53 accept
-
         {% for port in firewall_allowed_tcp_ports %}
         tcp dport {{ port }} accept
         {% endfor %}
