@@ -1,0 +1,39 @@
+firewall_name: "fw-otl3-otl2"
+
+firewall_interfaces:
+    input: "otl3"
+    output: "otl2"
+
+firewall_enable_ufw: true
+
+firewall_nft_input_policy: "drop"
+firewall_nft_forward_policy: "drop"
+firewall_nft_output_policy: "accept"
+
+firewall_ufw_default_input: "deny"
+firewall_ufw_default_output: "allow"
+firewall_ufw_default_forward: "deny"
+
+firewall_allowed_tcp_ports:
+    - 22
+
+firewall_allowed_udp_ports: []
+
+firewall_allowed_forward_rules:
+    - name: "OTL3 to OTL2 PLC Modbus"
+      iif: "otl3"
+      oif: "otl2"
+      proto: "tcp"
+      dport: 502
+
+    - name: "OTL2 to OTL3 return traffic"
+      iif: "otl2"
+      oif: "otl3"
+      proto: "tcp"
+      dport: 1024:65535
+
+    - name: "OTL3 to OTL2 SSH maintenance"
+      iif: "otl3"
+      oif: "otl2"
+      proto: "tcp"
+      dport: 22
