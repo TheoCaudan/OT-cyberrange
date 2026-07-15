@@ -1,11 +1,11 @@
 ---
-- name: "Ensure libvirt network XML files directory exists"
+- name: "Ensure temporary network directory exists"
   ansible.builtin.file:
       path: "/tmp/ot-lab-networks"
       state: directory
       mode: "0755"
 
-- name: "Render libvirt network XML definitions"
+- name: "Render network XML files"
   ansible.builtin.template:
       src: "networks.xml.j2"
       dest: "/tmp/ot-lab-networks/{{ item.name }}.xml"
@@ -16,10 +16,9 @@
   community.libvirt.virt_net:
       command: define
       name: "{{ item.name }}"
-      xml: "{{ lookup('template', 'networks.xml.j2') }}"
+      xml: "{{ lookup('file', '/tmp/ot-lab-networks/' ~ item.name ~ '.xml') }}"
       uri: "{{ libvirt_uri }}"
   loop: "{{ networks }}"
-  when: item.name is defined
 
 - name: "Autostart libvirt networks"
   community.libvirt.virt_net:
@@ -27,7 +26,6 @@
       name: "{{ item.name }}"
       uri: "{{ libvirt_uri }}"
   loop: "{{ networks }}"
-  when: item.autostart | default(true)
 
 - name: "Start libvirt networks"
   community.libvirt.virt_net:
