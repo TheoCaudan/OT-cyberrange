@@ -1,0 +1,46 @@
+firewall_name: "fw-it-dmz"
+
+firewall_interfaces:
+    input: "it"
+    output: "dmz"
+
+firewall_enable_ufw: true
+
+firewall_nft_input_policy: "drop"
+firewall_nft_forward_policy: "drop"
+firewall_nft_output_policy: "accept"
+
+firewall_ufw_default_input: "deny"
+firewall_ufw_default_output: "allow"
+firewall_ufw_default_forward: "deny"
+
+firewall_allowed_tcp_ports:
+    - 22
+
+firewall_allowed_udp_ports:
+    - 53
+
+firewall_allowed_forward_rules:
+    - name: "IT to DMZ Bastion SSH"
+      iif: "it"
+      oif: "dmz"
+      proto: "tcp"
+      dport: 22
+
+    - name: "IT to DMZ HTTPS"
+      iif: "it"
+      oif: "dmz"
+      proto: "tcp"
+      dport: 443
+
+    - name: "IT to DMZ HTTP"
+      iif: "it"
+      oif: "dmz"
+      proto: "tcp"
+      dport: 80
+
+    - name: "DMZ to IT DNS return"
+      iif: "dmz"
+      oif: "it"
+      proto: "udp"
+      dport: 53
