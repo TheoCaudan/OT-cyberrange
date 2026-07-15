@@ -5,16 +5,18 @@
 
   <os>
     <type arch="x86_64" machine="pc">hvm</type>
+    {% if item.type == "iso" %}
+    <boot dev="cdrom"/>
+    <boot dev="hd"/>
+    {% endif %}
   </os>
 
   <devices>
-    {% if item.type == "qcow2" %}
     <disk type="file" device="disk">
       <driver name="qemu" type="qcow2"/>
       <source file="/var/lib/libvirt/images/{{ item.name }}/{{ item.name }}.qcow2"/>
       <target dev="vda" bus="virtio"/>
     </disk>
-    {% endif %}
 
     {% if item.type == "iso" %}
     <disk type="file" device="cdrom">
@@ -22,12 +24,6 @@
       <source file="{{ item.base_image }}"/>
       <target dev="hdc" bus="ide"/>
       <readonly/>
-    </disk>
-
-    <disk type="file" device="disk">
-      <driver name="qemu" type="qcow2"/>
-      <source file="/var/lib/libvirt/images/{{ item.name }}/{{ item.name }}.qcow2"/>
-      <target dev="vda" bus="virtio"/>
     </disk>
     {% endif %}
 
