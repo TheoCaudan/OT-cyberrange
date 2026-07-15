@@ -8,6 +8,39 @@
     - "vars/networks.yml"
     - "vars/vms.yml"
 
+  tasks:
+    - name: "Destroy existing VMs if present"
+      community.libvirt.virt:
+        name: "{{ item.name }}"
+        state: destroyed
+        uri: "{{ libvirt_uri }}"
+      loop: "{{ vms }}"
+      ignore_errors: true
+
+    - name: "Undefine existing VMs if present"
+      community.libvirt.virt:
+        name: "{{ item.name }}"
+        command: undefine
+        uri: "{{ libvirt_uri }}"
+      loop: "{{ vms }}"
+      ignore_errors: true
+
+    - name: "Destroy existing networks if present"
+      community.libvirt.virt_net:
+        name: "{{ item.name }}"
+        state: inactive
+        uri: "{{ libvirt_uri }}"
+      loop: "{{ networks }}"
+      ignore_errors: true
+
+    - name: "Undefine existing networks if present"
+      community.libvirt.virt_net:
+        name: "{{ item.name }}"
+        command: undefine
+        uri: "{{ libvirt_uri }}"
+      loop: "{{ networks }}"
+      ignore_errors: true
+
   roles:
     - role: network
     - role: vm
