@@ -1,3 +1,5 @@
+# /!\ UNDER CONSTRUCTION : README.md OUT-OF-DATE !! /!\
+
 # OT Cyber Range
 
 Cyber-range OT modulaire basé sur QEMU/KVM, Ansible, Docker, nftables et ufw.
