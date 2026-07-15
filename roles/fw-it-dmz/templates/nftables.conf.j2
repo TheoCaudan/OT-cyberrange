@@ -5,7 +5,7 @@ table inet filter {
         type filter hook input priority 0; policy {{ firewall_nft_input_policy }};
 
         iif "lo" accept
-        ct state established,related,accept
+        ct state established,related accept
 
         tcp dport 22 accept
         udp dport 53 accept
