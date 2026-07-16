@@ -1,2 +1,7 @@
 ---
-to configure
+- name: "AD DC installation phase"
+  ansible.builtin.import_tasks: "install.yml"
+
+- name: "AD population phase"
+  ansible.builtin.import_tasks: "populate.yml"
+  when: ad_dc_enable_populate | default(false)
