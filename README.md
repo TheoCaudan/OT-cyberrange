@@ -123,6 +123,18 @@ OT-cyberrange/
 │   │       ├── docker-compose.yml.j2
 │   │       └── scada.env.j2
 │   └── plc/
+│   |   ├── defaults/
+│   |   │   └── main.yml
+│   |   ├── tasks/
+│   |   │   ├── main.yml
+│   |   │   ├── install.yml
+│   |   │   └── deploy.yml
+│   |   ├── handlers/
+│   |   │   └── main.yml
+│   |   └── templates/
+│   |       ├── docker-compose.yml.j2
+│   |       └── plc.env.j2
+|   └── caldera/
 │       ├── defaults/
 │       │   └── main.yml
 │       ├── tasks/
@@ -132,8 +144,7 @@ OT-cyberrange/
 │       ├── handlers/
 │       │   └── main.yml
 │       └── templates/
-│           ├── docker-compose.yml.j2
-│           └── plc.env.j2
+│           └── docker-compose.yml.j2
 ├── vars/
 │   ├── networks.yml
 │   ├── vms.yml
@@ -146,7 +157,7 @@ OT-cyberrange/
 │   ├── bastion.yml
 │   ├── scada.yml
 │   ├── plc.yml
-│   └── services.yml
+│   └── caldera.yml
 ├── host_vars/
 │   └── bastion/
 │       └── vault.yml
