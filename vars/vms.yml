@@ -78,8 +78,12 @@ vms:
       os_family: "linux"
       base_image: "images/debian-genericcloud.qcow2"
       role_vars: "vars/ad-client.yml"
+      extra_roles:
+        - "caldera"
+      extra_role_vars:
+        caldera: "vars/caldera.yml"
       networks:
-          - "it"
+        - "it"
 
     - name: "bastion"
       role: "bastion"
