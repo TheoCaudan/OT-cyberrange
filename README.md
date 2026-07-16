@@ -43,7 +43,8 @@ La logique générale suit une approche Purdue :
 
 ### Arborescence
 
-ot-lab/
+``` 
+OT-cyberrange/
 ├── deploy.yml
 ├── inventory/
 │   └── lab.yml
@@ -155,7 +156,7 @@ ot-lab/
 ├── iso/
 │   └── windows-server-2022.iso
 └── README.md
-
+``` 
 ---
 ### Prérequis
 
