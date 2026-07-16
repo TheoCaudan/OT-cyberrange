@@ -1,0 +1,24 @@
+services:
+  openplc:
+    image: "{{ plc_image }}"
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "{{ plc_port }}:{{ plc_port }}"
+      - "{{ plc_modbus_port }}:{{ plc_modbus_port }}"
+    volumes:
+      - "{{ plc_config_dir }}:/openplc/config"
+      - "{{ plc_data_dir }}:/openplc/data"
+      - "{{ plc_logs_dir }}:/openplc/logs"
+
+  python-worker:
+    image: "{{ plc_python_image }}"
+    restart: unless-stopped
+    depends_on:
+      - openplc
+    working_dir: /app
+    command: ["python", "/app/main.py"]
+    volumes:
+      - "{{ plc_app_dir }}:/app"
+      - "{{ plc_logs_dir }}:/logs"
