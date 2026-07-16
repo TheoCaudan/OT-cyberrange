@@ -1,0 +1,23 @@
+---
+- name: "Install Docker packages"
+  ansible.builtin.apt:
+      name:
+          - docker.io
+          - docker-compose-plugin
+      state: present
+      update_cache: true
+  when: plc_docker_enabled | default(true)
+
+- name: "Ensure PLC directories exist"
+  ansible.builtin.file:
+      path: "{{ item }}"
+      state: directory
+      owner: "{{ plc_user }}"
+      group: "{{ plc_group }}"
+      mode: "0755"
+  loop:
+      - "{{ plc_dir }}"
+      - "{{ plc_app_dir }}"
+      - "{{ plc_config_dir }}"
+      - "{{ plc_data_dir }}"
+      - "{{ plc_logs_dir }}"
