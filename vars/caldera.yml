@@ -1,0 +1,19 @@
+---
+caldera_name: "caldera"
+caldera_docker_enabled: true
+
+caldera_dir: "/opt/caldera"
+caldera_config_dir: "/opt/caldera/config"
+caldera_data_dir: "/opt/caldera/data"
+caldera_logs_dir: "/opt/caldera/logs"
+
+caldera_user: "root"
+caldera_group: "root"
+
+caldera_timezone: "UTC"
+
+caldera_image: "mitre/caldera"
+caldera_port: 8888
+
+caldera_logging_enabled: true
+caldera_db_enabled: false
