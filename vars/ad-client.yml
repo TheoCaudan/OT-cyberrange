@@ -1,0 +1,19 @@
+ad_client_hostname: "client-ad"
+ad_client_domain_name: "lab.local"
+ad_client_netbios_name: "LAB"
+
+ad_client_timezone: "UTC"
+
+ad_client_cpu: 2
+ad_client_ram_mb: 4096
+ad_client_disk_gb: 40
+
+ad_client_join_domain: true
+ad_client_join_user: "labadmin"
+
+ad_client_packages:
+    - "curl"
+    - "vim"
+    - "net-tools"
+
+ad_client_enable_tools: true
