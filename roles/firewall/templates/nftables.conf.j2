@@ -7,6 +7,7 @@ table inet filter {
         iif "lo" accept
         ct state established,related accept
 
+        {# Insert your approved input service ports here #}
         {% for port in firewall_allowed_tcp_ports %}
         tcp dport {{ port }} accept
         {% endfor %}
@@ -21,6 +22,7 @@ table inet filter {
 
         ct state established,related accept
 
+        {# Insert your approved forward rules here #}
         {% for rule in firewall_allowed_forward_rules %}
         {% if rule.proto == "tcp" %}
         iif "{{ rule.iif }}" oif "{{ rule.oif }}" tcp dport {{ rule.dport }} accept comment "{{ rule.name }}"
