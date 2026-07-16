@@ -1,0 +1,22 @@
+---
+- name: "Install Docker packages"
+  ansible.builtin.apt:
+    name:
+      - docker.io
+      - docker-compose-plugin
+    state: present
+    update_cache: true
+  when: caldera_docker_enabled | default(true)
+
+- name: "Ensure CALDERA directories exist"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ caldera_user }}"
+    group: "{{ caldera_group }}"
+    mode: "0755"
+  loop:
+    - "{{ caldera_dir }}"
+    - "{{ caldera_config_dir }}"
+    - "{{ caldera_data_dir }}"
+    - "{{ caldera_logs_dir }}"
