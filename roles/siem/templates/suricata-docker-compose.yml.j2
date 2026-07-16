@@ -1,0 +1,6 @@
+services:
+  suricata:
+    image: "{{ siem_suricata_image | default('jasonish/suricata') }}"
+    restart: unless-stopped
+    network_mode: host
+    command: ["-i", "{{ siem_suricata_listen_interface }}"]
