@@ -1,0 +1,5 @@
+---
+- name: "Restart SCADA stack"
+  ansible.builtin.command: docker compose up -d
+  args:
+      chdir: "{{ scada_dir }}"
