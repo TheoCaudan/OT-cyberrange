@@ -1,0 +1,24 @@
+---
+- name: "Render SCADA environment file"
+  ansible.builtin.template:
+      src: "scada.env.j2"
+      dest: "{{ scada_dir }}/.env"
+      owner: "{{ scada_user }}"
+      group: "{{ scada_group }}"
+      mode: "0644"
+  notify: "Restart SCADA stack"
+
+- name: "Render SCADA docker compose file"
+  ansible.builtin.template:
+      src: "docker-compose.yml.j2"
+      dest: "{{ scada_dir }}/docker-compose.yml"
+      owner: "{{ scada_user }}"
+      group: "{{ scada_group }}"
+      mode: "0644"
+  notify: "Restart SCADA stack"
+
+- name: "Start SCADA stack"
+  ansible.builtin.command: docker compose up -d
+  args:
+      chdir: "{{ scada_dir }}"
+  when: scada_docker_enabled | default(true)
