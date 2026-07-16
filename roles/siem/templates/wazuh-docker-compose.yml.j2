@@ -1,0 +1,7 @@
+services:
+  wazuh:
+    image: "{{ siem_wazuh_image | default('wazuh/wazuh') }}"
+    restart: unless-stopped
+    ports:
+      - "{{ siem_wazuh_api_port }}:55000"
+      - "{{ siem_wazuh_ui_port }}:5601"
