@@ -1,0 +1,23 @@
+---
+bastion_name: "bastion"
+bastion_enable_guacamole: true
+bastion_docker_enabled: true
+
+bastion_dir: "/opt/bastion"
+bastion_compose_file: "/opt/bastion/docker-compose.yml"
+bastion_env_file: "/opt/bastion/.env"
+
+bastion_listen_port: 8080
+bastion_timezone: "UTC"
+
+bastion_logging_enabled: true
+
+bastion_allowed_sources: []
+
+bastion_target_zones:
+    - "dmz"
+    - "otl3"
+    - "otl2"
+
+guacamole_image: "guacamole/guacamole"
+guacd_image: "guacamole/guacd"
