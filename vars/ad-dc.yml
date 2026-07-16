@@ -1,0 +1,39 @@
+---
+ad_domain_name: "lab.local"
+ad_netbios_name: "LAB"
+
+ad_dc_hostname: "dc"
+ad_dc_name: "DC01"
+
+ad_dc_timezone: "UTC"
+ad_dc_admin_user: "Administrator"
+
+ad_dc_enable_populate: true
+ad_dc_post_install_script: "populate_ad.ps1"
+
+ad_dc_ou_structure:
+    - "Servers"
+    - "Clients"
+    - "Users"
+
+ad_dc_groups:
+    - "OT Operators"
+    - "IT Users"
+    - "Lab Admins"
+
+ad_dc_users:
+    - name: "labadmin"
+      display_name: "Lab Admin"
+      groups:
+          - "Lab Admins"
+
+    - name: "operator"
+      display_name: "OT Operator"
+      groups:
+          - "OT Operators"
+
+ad_dc_gpos:
+    - name: "Baseline Security"
+      links:
+          - "Servers"
+          - "Clients"
