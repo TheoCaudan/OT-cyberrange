@@ -6,7 +6,9 @@ vms:
       ram_mb: 2048
       disk_gb: 20
       type: "qcow2"
+      os_family: "linux"
       base_image: "images/debian-genericcloud.qcow2"
+      role_vars: "vars/firewall-it-dmz.yml"
       networks:
           - "it"
           - "dmz"
@@ -18,7 +20,9 @@ vms:
       ram_mb: 2048
       disk_gb: 20
       type: "qcow2"
+      os_family: "linux"
       base_image: "images/debian-genericcloud.qcow2"
+      role_vars: "vars/firewall-dmz-otl3.yml"
       networks:
           - "dmz"
           - "otl3"
@@ -30,7 +34,9 @@ vms:
       ram_mb: 2048
       disk_gb: 20
       type: "qcow2"
+      os_family: "linux"
       base_image: "images/debian-genericcloud.qcow2"
+      role_vars: "vars/firewall-otl3-otl2.yml"
       networks:
           - "otl3"
           - "otl2"
@@ -42,18 +48,23 @@ vms:
       ram_mb: 4096
       disk_gb: 40
       type: "qcow2"
+      os_family: "linux"
       base_image: "images/debian-genericcloud.qcow2"
+      role_vars: "vars/siem.yml"
       networks:
           - "dmz"
 
     - name: "dc"
-      role: "ad_dc"
+      role: "ad-dc"
       zone: "it"
       cpu: 4
       ram_mb: 8192
       disk_gb: 60
       type: "iso"
+      os_family: "windows"
+      firmware: "uefi"
       base_image: "iso/windows-server-2022.iso"
+      role_vars: "vars/ad-dc.yml"
       networks:
           - "it"
 
@@ -64,7 +75,9 @@ vms:
       ram_mb: 4096
       disk_gb: 40
       type: "qcow2"
+      os_family: "linux"
       base_image: "images/debian-genericcloud.qcow2"
+      role_vars: "vars/ad-client.yml"
       networks:
           - "it"
 
@@ -75,7 +88,9 @@ vms:
       ram_mb: 2048
       disk_gb: 20
       type: "qcow2"
+      os_family: "linux"
       base_image: "images/debian-genericcloud.qcow2"
+      role_vars: "vars/bastion.yml"
       networks:
           - "dmz"
 
@@ -86,7 +101,9 @@ vms:
       ram_mb: 4096
       disk_gb: 40
       type: "qcow2"
+      os_family: "linux"
       base_image: "images/debian-genericcloud.qcow2"
+      role_vars: "vars/scada.yml"
       networks:
           - "otl3"
 
@@ -97,6 +114,8 @@ vms:
       ram_mb: 2048
       disk_gb: 20
       type: "qcow2"
+      os_family: "linux"
       base_image: "images/debian-genericcloud.qcow2"
+      role_vars: "vars/plc.yml"
       networks:
           - "otl2"
