@@ -1,0 +1,11 @@
+---
+- name: "Set client hostname"
+  ansible.builtin.hostname:
+      name: "{{ ad_client_hostname }}"
+
+- name: "Install base packages"
+  ansible.builtin.apt:
+      name: "{{ ad_client_packages }}"
+      state: present
+      update_cache: true
+  when: ad_client_enable_tools | default(true)
