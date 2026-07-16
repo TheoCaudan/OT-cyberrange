@@ -1,0 +1,6 @@
+vars:
+  address-groups:
+    HOME_NET:
+{% for net in siem_home_nets %}
+      - "{{ net }}"
+{% endfor %}
