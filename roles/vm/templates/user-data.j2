@@ -1,0 +1,17 @@
+#cloud-config
+hostname: {{ vm.hostname | default(vm.name) }}
+manage_etc_hosts: true
+
+users:
+  - name: {{ vm.admin_user | default("admin") }}
+    groups: sudo
+    shell: /bin/bash
+    sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+
+ssh_authorized_keys:
+{% for key in vm.ssh_authorized_keys | default([]) %}
+  - {{ key }}
+{% endfor %}
+
+package_update: true
+package_upgrade: true
