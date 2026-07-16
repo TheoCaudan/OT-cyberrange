@@ -1,2 +1,31 @@
 ---
-to configure
+- name: "Wait for WinRM to be available"
+  ansible.builtin.wait_for_connection:
+      delay: 30
+      timeout: 1800
+
+- name: "Gather facts"
+  ansible.builtin.setup:
+
+- name: "Ensure desired hostname is set"
+  ansible.windows.win_hostname:
+      name: "{{ ad_dc_hostname }}"
+  register: dc_hostname
+
+- name: "Reboot if hostname changed"
+  ansible.windows.win_reboot:
+  when: dc_hostname.reboot_required | default(false)
+
+- name: "Install required Windows features"
+  ansible.windows.win_feature:
+      name:
+          - AD-Domain-Services
+          - DNS
+          - RSAT-ADDS
+      state: present
+      include_management_tools: true
+  register: win_features
+
+- name: "Reboot if features require it"
+  ansible.windows.win_reboot:
+  when: win_features.reboot_required | default(false)
