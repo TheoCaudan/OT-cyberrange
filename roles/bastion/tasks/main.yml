@@ -1,0 +1,47 @@
+---
+- name: "Install base packages"
+  ansible.builtin.apt:
+      name:
+          - docker.io
+          - docker-compose-plugin
+      state: present
+      update_cache: true
+  when: bastion_docker_enabled
+
+- name: "Ensure bastion directory exists"
+  ansible.builtin.file:
+      path: "{{ bastion_dir }}"
+      state: directory
+      owner: "{{ bastion_user }}"
+      group: "{{ bastion_group }}"
+      mode: "0755"
+
+- name: "Check that Guacamole secrets are defined"
+  ansible.builtin.assert:
+      that:
+          - guacamole_db_password is defined
+          - guacamole_db_password | length > 0
+          - guacamole_admin_username is defined
+          - guacamole_admin_username | length > 0
+          - guacamole_admin_password is defined
+          - guacamole_admin_password | length > 0
+      fail_msg: "Guacamole secrets must be defined in host_vars/bastion/vault.yml."
+  when: bastion_enable_guacamole
+
+- name: "Render bastion environment file"
+  ansible.builtin.template:
+      src: "bastion.env.j2"
+      dest: "{{ bastion_env_file }}"
+      owner: "{{ bastion_user }}"
+      group: "{{ bastion_group }}"
+      mode: "0644"
+  notify: "Restart bastion stack"
+
+- name: "Render bastion docker compose file"
+  ansible.builtin.template:
+      src: "docker-compose.yml.j2"
+      dest: "{{ bastion_compose_file }}"
+      owner: "{{ bastion_user }}"
+      group: "{{ bastion_group }}"
+      mode: "0644"
+  notify: "Restart bastion stack"
