@@ -1,5 +1,3 @@
-ENABLED=yes
-LOGLEVEL=low
-DEFAULT_INPUT_POLICY={{ firewall_ufw_default_input | upper }}
-DEFAULT_OUTPUT_POLICY={{ firewall_ufw_default_output | upper }}
-DEFAULT_FORWARD_POLICY={{ firewall_ufw_default_forward | upper }}
+DEFAULT_INPUT={{ firewall_ufw_default_input }}
+DEFAULT_OUTPUT={{ firewall_ufw_default_output }}
+DEFAULT_FORWARD={{ firewall_ufw_default_forward }}
