@@ -1,0 +1,10 @@
+---
+- name: "Create marker for post-join configuration"
+  ansible.builtin.debug:
+      msg: "Domain join completed for {{ ad_client_hostname }}"
+
+- name: "Reboot if required after domain join"
+  ansible.builtin.reboot:
+  when:
+      - ad_client_reboot_after_join | default(true)
+      - ad_client_needs_reboot | default(false)
