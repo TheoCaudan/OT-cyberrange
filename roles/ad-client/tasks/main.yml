@@ -1,0 +1,11 @@
+---
+- name: "AD client installation phase"
+  ansible.builtin.import_tasks: "install.yml"
+
+- name: "AD client domain join phase"
+  ansible.builtin.import_tasks: "join_domain.yml"
+  when: ad_client_join_domain | default(false)
+
+- name: "AD client post-join phase"
+  ansible.builtin.import_tasks: "post_join.yml"
+  when: ad_client_join_domain | default(false)
