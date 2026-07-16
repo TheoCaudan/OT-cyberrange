@@ -1,0 +1,48 @@
+---
+- name: "Create Linux VM directory"
+  ansible.builtin.file:
+      path: "/var/lib/libvirt/images/{{ vm.name }}"
+      state: directory
+      mode: "0755"
+
+- name: "Render cloud-init user-data"
+  ansible.builtin.template:
+      src: "user-data.j2"
+      dest: "/var/lib/libvirt/images/{{ vm.name }}/user-data"
+      mode: "0644"
+
+- name: "Render cloud-init meta-data"
+  ansible.builtin.template:
+      src: "meta-data.j2"
+      dest: "/var/lib/libvirt/images/{{ vm.name }}/meta-data"
+      mode: "0644"
+
+- name: "Create cloud-init seed image"
+  ansible.builtin.command: >
+      cloud-localds
+      /var/lib/libvirt/images/{{ vm.name }}/seed.iso
+      /var/lib/libvirt/images/{{ vm.name }}/user-data
+      /var/lib/libvirt/images/{{ vm.name }}/meta-data
+  args:
+      creates: "/var/lib/libvirt/images/{{ vm.name }}/seed.iso"
+
+- name: "Create QCOW2 backing disk"
+  ansible.builtin.command: >
+      qemu-img create -f qcow2 -b {{ vm.base_image }}
+      /var/lib/libvirt/images/{{ vm.name }}/{{ vm.name }}.qcow2
+  args:
+      creates: "/var/lib/libvirt/images/{{ vm.name }}/{{ vm.name }}.qcow2"
+
+- name: "Render Linux VM XML"
+  ansible.builtin.template:
+      src: "vm.xml.j2"
+      dest: "/tmp/{{ vm.name }}.xml"
+      mode: "0644"
+
+- name: "Define Linux VM in libvirt"
+  ansible.builtin.command: >
+      virsh define /tmp/{{ vm.name }}.xml
+
+- name: "Start Linux VM"
+  ansible.builtin.command: >
+      virsh start {{ vm.name }}
