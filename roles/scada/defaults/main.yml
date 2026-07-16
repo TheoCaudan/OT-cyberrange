@@ -1,0 +1,25 @@
+---
+scada_name: "scada"
+scada_docker_enabled: true
+
+scada_dir: "/opt/scada"
+scada_app_dir: "/opt/scada/app"
+scada_config_dir: "/opt/scada/config"
+scada_data_dir: "/opt/scada/data"
+scada_logs_dir: "/opt/scada/logs"
+
+scada_user: "root"
+scada_group: "root"
+
+scada_timezone: "UTC"
+
+scada_image: "ignition/ignition"
+scada_port: 8088
+
+scada_logging_enabled: true
+
+scada_db_enabled: false
+scada_db_hostname: "db"
+scada_db_port: 5432
+scada_db_name: "ignition"
+scada_db_username: "ignition"
