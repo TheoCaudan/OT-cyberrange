@@ -1,10 +1,17 @@
 firewall_name: "fw-dmz-otl3"
 
+firewall_zone_a: "dmz"
+firewall_zone_b: "otl3"
+
 firewall_interfaces:
     input: "dmz"
     output: "otl3"
 
-firewall_enable_ufw: true
+firewall_frontend_mode: "ufw"
+firewall_backend_mode: "nftables"
+
+firewall_frontend_enabled: true
+firewall_backend_enabled: true
 
 firewall_nft_input_policy: "drop"
 firewall_nft_forward_policy: "drop"
@@ -14,26 +21,12 @@ firewall_ufw_default_input: "deny"
 firewall_ufw_default_output: "allow"
 firewall_ufw_default_forward: "deny"
 
-firewall_allowed_tcp_ports:
-    - 22
-
+firewall_allowed_tcp_ports: []
 firewall_allowed_udp_ports: []
 
 firewall_allowed_forward_rules:
-    - name: "DMZ to OTL3 SCADA access"
-      iif: "dmz"
-      oif: "otl3"
-      proto: "tcp"
-      dport: 502
-
     - name: "DMZ to OTL3 Bastion SSH"
       iif: "dmz"
       oif: "otl3"
       proto: "tcp"
       dport: 22
-
-    - name: "OTL3 to DMZ return traffic"
-      iif: "otl3"
-      oif: "dmz"
-      proto: "tcp"
-      dport: 1024:65535
