@@ -1,0 +1,6 @@
+---
+- name: "Install PLC dependencies"
+  ansible.builtin.import_tasks: "install.yml"
+
+- name: "Deploy PLC stack"
+  ansible.builtin.import_tasks: "deploy.yml"
