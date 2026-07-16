@@ -6,3 +6,4 @@ all:
   vars:
     libvirt_uri: "qemu:///system"
     libvirt_connection: "system"
+    lab_name: "ot-lab"
