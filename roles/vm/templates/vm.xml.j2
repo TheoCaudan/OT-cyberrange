@@ -1,12 +1,14 @@
 <domain type="kvm">
-  <name>{{ item.name }}</name>
-  <memory unit="MiB">{{ item.ram_mb }}</memory>
-  <vcpu>{{ item.cpu }}</vcpu>
+  <name>{{ vm.name }}</name>
+  <memory unit="MiB">{{ vm.ram_mb }}</memory>
+  <vcpu>{{ vm.cpu }}</vcpu>
 
   <os>
     <type arch="x86_64" machine="pc">hvm</type>
-    {% if item.type == "iso" %}
+    {% if vm.os_family | default("linux") == "windows" %}
     <boot dev="cdrom"/>
+    <boot dev="hd"/>
+    {% else %}
     <boot dev="hd"/>
     {% endif %}
   </os>
@@ -14,20 +16,29 @@
   <devices>
     <disk type="file" device="disk">
       <driver name="qemu" type="qcow2"/>
-      <source file="/var/lib/libvirt/images/{{ item.name }}/{{ item.name }}.qcow2"/>
+      <source file="/var/lib/libvirt/images/{{ vm.name }}/{{ vm.name }}.qcow2"/>
       <target dev="vda" bus="virtio"/>
     </disk>
 
-    {% if item.type == "iso" %}
+    {% if vm.os_family | default("linux") == "linux" %}
     <disk type="file" device="cdrom">
       <driver name="qemu" type="raw"/>
-      <source file="{{ item.base_image }}"/>
+      <source file="/var/lib/libvirt/images/{{ vm.name }}/seed.iso"/>
+      <target dev="hdb" bus="ide"/>
+      <readonly/>
+    </disk>
+    {% endif %}
+
+    {% if vm.os_family | default("linux") == "windows" %}
+    <disk type="file" device="cdrom">
+      <driver name="qemu" type="raw"/>
+      <source file="{{ vm.base_image }}"/>
       <target dev="hdc" bus="ide"/>
       <readonly/>
     </disk>
     {% endif %}
 
-    {% for net in item.networks %}
+    {% for net in vm.networks %}
     <interface type="network">
       <source network="{{ net }}"/>
       <model type="virtio"/>
