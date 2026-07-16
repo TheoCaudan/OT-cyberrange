@@ -1,0 +1,12 @@
+services:
+  scada:
+    image: "{{ scada_image }}"
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "{{ scada_port }}:{{ scada_port }}"
+    volumes:
+      - "{{ scada_config_dir }}:/opt/ignition/data"
+      - "{{ scada_data_dir }}:/opt/ignition/share"
+      - "{{ scada_logs_dir }}:/opt/ignition/logs"
