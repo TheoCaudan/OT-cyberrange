@@ -7,45 +7,35 @@
 
 - name: "Check base images exist"
   ansible.builtin.stat:
-      path: "{{ item.base_image }}"
+      path: "{{ vm.base_image }}"
   register: base_images
   loop: "{{ vms }}"
+  loop_control:
+      loop_var: vm
+  when: vm.base_image is defined
 
 - name: "Fail if a base image is missing"
   ansible.builtin.fail:
       msg: "Missing base image: {{ item.item.base_image }}"
   when: not item.stat.exists
   loop: "{{ base_images.results }}"
+  loop_control:
+      label: "{{ item.item.name }}"
 
-- name: "Create VM directories"
-  ansible.builtin.file:
-      path: "/var/lib/libvirt/images/{{ item.name }}"
-      state: directory
-      mode: "0755"
+- name: "Process Linux VMs"
+  ansible.builtin.include_tasks: linux.yml
   loop: "{{ vms }}"
+  loop_control:
+      loop_var: vm
+  when:
+      - vm.type == "qcow2"
+      - vm.os_family | default("linux") == "linux"
 
-- name: "Create QCOW2 backing disks"
-  ansible.builtin.command: >
-      qemu-img create -f qcow2 -b {{ item.base_image }}
-      /var/lib/libvirt/images/{{ item.name }}/{{ item.name }}.qcow2
-  args:
-      creates: "/var/lib/libvirt/images/{{ item.name }}/{{ item.name }}.qcow2"
+- name: "Process Windows VMs"
+  ansible.builtin.include_tasks: windows.yml
   loop: "{{ vms }}"
-  when: item.type == "qcow2"
-
-- name: "Create empty disks for ISO-based VMs"
-  ansible.builtin.command: >
-      qemu-img create -f qcow2
-      /var/lib/libvirt/images/{{ item.name }}/{{ item.name }}.qcow2
-      {{ item.disk_gb }}G
-  args:
-      creates: "/var/lib/libvirt/images/{{ item.name }}/{{ item.name }}.qcow2"
-  loop: "{{ vms }}"
-  when: item.type == "iso"
-
-- name: "Render VM XML definitions"
-  ansible.builtin.template:
-      src: "vm.xml.j2"
-      dest: "/tmp/{{ item.name }}.xml"
-      mode: "0644"
-  loop: "{{ vms }}"
+  loop_control:
+      loop_var: vm
+  when:
+      - vm.type == "iso"
+      - vm.os_family | default("linux") == "windows"
