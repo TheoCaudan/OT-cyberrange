@@ -1,0 +1,32 @@
+---
+- name: "Install domain join prerequisites"
+  ansible.builtin.apt:
+      name:
+          - realmd
+          - sssd
+          - sssd-tools
+          - adcli
+          - samba-common-bin
+          - oddjob
+          - oddjob-mkhomedir
+          - packagekit
+      state: present
+      update_cache: true
+
+- name: "Discover domain"
+  ansible.builtin.command: "realm discover {{ ad_client_domain_name }}"
+  register: realm_discover
+  changed_when: false
+  failed_when: realm_discover.rc != 0
+
+- name: "Join domain"
+  ansible.builtin.command: >
+      realm join {{ ad_client_domain_name }}
+      -U {{ ad_client_join_user }}
+  register: realm_join
+  changed_when: realm_join.rc == 0
+
+- name: "Trigger reboot after domain join"
+  ansible.builtin.set_fact:
+      ad_client_needs_reboot: true
+  when: realm_join is changed
