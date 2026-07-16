@@ -1,0 +1,12 @@
+services:
+  caldera:
+    image: "{{ caldera_image }}"
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "{{ caldera_port }}:8888"
+    volumes:
+      - "{{ caldera_config_dir }}:/app/conf"
+      - "{{ caldera_data_dir }}:/app/data"
+      - "{{ caldera_logs_dir }}:/app/logs"
