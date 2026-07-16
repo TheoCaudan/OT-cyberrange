@@ -1,0 +1,46 @@
+---
+- name: "Render Wazuh compose file"
+  ansible.builtin.template:
+      src: "wazuh-docker-compose.yml.j2"
+      dest: "{{ siem_dir }}/docker-compose-wazuh.yml"
+      owner: "{{ siem_user }}"
+      group: "{{ siem_group }}"
+      mode: "0644"
+  when: siem_enable_wazuh | default(true)
+  notify: "Restart SIEM stack"
+
+- name: "Render Suricata compose file"
+  ansible.builtin.template:
+      src: "suricata-docker-compose.yml.j2"
+      dest: "{{ siem_dir }}/docker-compose-suricata.yml"
+      owner: "{{ siem_user }}"
+      group: "{{ siem_group }}"
+      mode: "0644"
+  when: siem_enable_suricata | default(true)
+  notify: "Restart SIEM stack"
+
+- name: "Render Wazuh configuration"
+  ansible.builtin.template:
+      src: "ossec.conf.j2"
+      dest: "{{ siem_config_dir }}/ossec.conf"
+      owner: "{{ siem_user }}"
+      group: "{{ siem_group }}"
+      mode: "0644"
+  when: siem_enable_wazuh | default(true)
+  notify: "Restart SIEM stack"
+
+- name: "Render Suricata configuration"
+  ansible.builtin.template:
+      src: "suricata.yaml.j2"
+      dest: "{{ siem_config_dir }}/suricata.yaml"
+      owner: "{{ siem_user }}"
+      group: "{{ siem_group }}"
+      mode: "0644"
+  when: siem_enable_suricata | default(true)
+  notify: "Restart SIEM stack"
+
+- name: "Start SIEM stack"
+  ansible.builtin.command: docker compose up -d
+  args:
+      chdir: "{{ siem_dir }}"
+  when: siem_docker_enabled | default(true)
