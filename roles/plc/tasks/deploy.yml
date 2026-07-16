@@ -1,0 +1,24 @@
+---
+- name: "Render PLC environment file"
+  ansible.builtin.template:
+      src: "plc.env.j2"
+      dest: "{{ plc_dir }}/.env"
+      owner: "{{ plc_user }}"
+      group: "{{ plc_group }}"
+      mode: "0644"
+  notify: "Restart PLC stack"
+
+- name: "Render PLC docker compose file"
+  ansible.builtin.template:
+      src: "docker-compose.yml.j2"
+      dest: "{{ plc_dir }}/docker-compose.yml"
+      owner: "{{ plc_user }}"
+      group: "{{ plc_group }}"
+      mode: "0644"
+  notify: "Restart PLC stack"
+
+- name: "Start PLC stack"
+  ansible.builtin.command: docker compose up -d
+  args:
+      chdir: "{{ plc_dir }}"
+  when: plc_docker_enabled | default(true)
