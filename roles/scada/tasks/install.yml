@@ -1,0 +1,23 @@
+---
+- name: "Install Docker packages"
+  ansible.builtin.apt:
+      name:
+          - docker.io
+          - docker-compose-plugin
+      state: present
+      update_cache: true
+  when: scada_docker_enabled | default(true)
+
+- name: "Ensure SCADA directories exist"
+  ansible.builtin.file:
+      path: "{{ item }}"
+      state: directory
+      owner: "{{ scada_user }}"
+      group: "{{ scada_group }}"
+      mode: "0755"
+  loop:
+      - "{{ scada_dir }}"
+      - "{{ scada_app_dir }}"
+      - "{{ scada_config_dir }}"
+      - "{{ scada_data_dir }}"
+      - "{{ scada_logs_dir }}"
