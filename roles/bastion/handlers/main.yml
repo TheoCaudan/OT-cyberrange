@@ -1,0 +1,6 @@
+---
+- name: "Restart bastion stack"
+  ansible.builtin.command: docker compose up -d
+  args:
+    chdir: "{{ bastion_dir }}"
+  when: bastion_enable_guacamole
