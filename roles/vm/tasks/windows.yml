@@ -1,0 +1,28 @@
+---
+- name: "Create Windows VM directory"
+  ansible.builtin.file:
+      path: "/var/lib/libvirt/images/{{ vm.name }}"
+      state: directory
+      mode: "0755"
+
+- name: "Create empty disk for Windows VM"
+  ansible.builtin.command: >
+      qemu-img create -f qcow2
+      /var/lib/libvirt/images/{{ vm.name }}/{{ vm.name }}.qcow2
+      {{ vm.disk_gb }}G
+  args:
+      creates: "/var/lib/libvirt/images/{{ vm.name }}/{{ vm.name }}.qcow2"
+
+- name: "Render Windows VM XML"
+  ansible.builtin.template:
+      src: "vm.xml.j2"
+      dest: "/tmp/{{ vm.name }}.xml"
+      mode: "0644"
+
+- name: "Define Windows VM in libvirt"
+  ansible.builtin.command: >
+      virsh define /tmp/{{ vm.name }}.xml
+
+- name: "Start Windows VM"
+  ansible.builtin.command: >
+      virsh start {{ vm.name }}
