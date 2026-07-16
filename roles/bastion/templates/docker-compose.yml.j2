@@ -1,0 +1,40 @@
+services:
+  guacd:
+    image: "{{ guacd_image }}"
+    restart: unless-stopped
+    networks:
+      - bastion_internal
+
+  db:
+    image: "{{ guacamole_db_image }}"
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: "{{ guacamole_db_name }}"
+      POSTGRES_USER: "{{ guacamole_db_username }}"
+      POSTGRES_PASSWORD: "{{ guacamole_db_password }}"
+    volumes:
+      - "{{ bastion_data_dir }}/db:/var/lib/postgresql/data"
+    networks:
+      - bastion_internal
+
+  guacamole:
+    image: "{{ guacamole_image }}"
+    restart: unless-stopped
+    depends_on:
+      - guacd
+      - db
+    env_file:
+      - .env
+    ports:
+      - "{{ bastion_listen_port }}:8080"
+    volumes:
+      - "{{ bastion_config_dir }}:/config"
+    networks:
+      - bastion_internal
+      - bastion_public
+
+networks:
+  bastion_internal:
+    internal: true
+  bastion_public:
+    driver: bridge
