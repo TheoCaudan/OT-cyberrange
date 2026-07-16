@@ -1,0 +1,36 @@
+---
+bastion_name: "bastion"
+bastion_enable_guacamole: true
+bastion_docker_enabled: true
+
+bastion_dir: "/opt/bastion"
+bastion_compose_file: "/opt/bastion/docker-compose.yml"
+bastion_env_file: "/opt/bastion/.env"
+
+bastion_data_dir: "/opt/bastion/data"
+bastion_logs_dir: "/opt/bastion/logs"
+bastion_config_dir: "/opt/bastion/config"
+
+bastion_user: "root"
+bastion_group: "root"
+
+bastion_timezone: "UTC"
+bastion_listen_port: 8080
+bastion_logging_enabled: true
+
+bastion_internal_network: "bastion_internal"
+bastion_public_network: "bastion_public"
+
+guacamole_app_name: "guacamole"
+guacamole_auth_provider: "postgresql"
+
+guacamole_guacd_hostname: "guacd"
+guacamole_guacd_port: 4822
+guacamole_image: "guacamole/guacamole"
+guacd_image: "guacamole/guacd"
+
+guacamole_db_hostname: "db"
+guacamole_db_port: 5432
+guacamole_db_name: "guacamole"
+guacamole_db_username: "guacamole"
+guacamole_db_image: "postgres:16"
