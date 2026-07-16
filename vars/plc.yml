@@ -1,0 +1,27 @@
+---
+plc_name: "plc"
+plc_docker_enabled: true
+
+plc_dir: "/opt/plc"
+plc_app_dir: "/opt/plc/app"
+plc_config_dir: "/opt/plc/config"
+plc_data_dir: "/opt/plc/data"
+plc_logs_dir: "/opt/plc/logs"
+
+plc_user: "root"
+plc_group: "root"
+
+plc_timezone: "UTC"
+
+plc_image: "openplcproject/openplc"
+plc_port: 8080
+plc_modbus_port: 502
+
+plc_python_image: "python:3.11-slim"
+
+plc_enable_python_worker: true
+plc_enable_openplc: true
+
+plc_script_name: "plc-sim.py"
+plc_modbus_target_host: "127.0.0.1"
+plc_modbus_target_port: 502
