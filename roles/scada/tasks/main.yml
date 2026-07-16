@@ -1,0 +1,6 @@
+---
+- name: "Install SCADA dependencies"
+  ansible.builtin.import_tasks: "install.yml"
+
+- name: "Deploy SCADA stack"
+  ansible.builtin.import_tasks: "deploy.yml"
