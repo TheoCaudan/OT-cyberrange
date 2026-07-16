@@ -1,2 +1,53 @@
----
-to configure
+# PowerShell post-install skeleton for AD population
+
+$domainName = "{{ ad_domain_name }}"
+$netbiosName = "{{ ad_netbios_name }}"
+
+$ouStructure = @(
+{% for ou in ad_dc_ou_structure %}
+    "{{ ou }}"{% if not loop.last %},{% endif %}
+{% endfor %}
+)
+
+$groups = @(
+{% for group in ad_dc_groups %}
+    "{{ group }}"{% if not loop.last %},{% endif %}
+{% endfor %}
+)
+
+$users = @(
+{% for user in ad_dc_users %}
+    @{
+        Name = "{{ user.name }}"
+        DisplayName = "{{ user.display_name | default(user.name) }}"
+        Groups = @(
+{% for group in user.groups | default([]) %}
+            "{{ group }}"{% if not loop.last %},{% endif %}
+{% endfor %}
+        )
+    }{% if not loop.last %},{% endif %}
+{% endfor %}
+)
+
+$gpos = @(
+{% for gpo in ad_dc_gpos | default([]) %}
+    @{
+        Name = "{{ gpo.name }}"
+        Links = @(
+{% for link in gpo.links | default([]) %}
+            "{{ link }}"{% if not loop.last %},{% endif %}
+{% endfor %}
+        )
+    }{% if not loop.last %},{% endif %}
+{% endfor %}
+)
+
+# TODO:
+# - create/check OUs
+# - create/check groups
+# - create/check users
+# - create/check GPOs
+# - link GPOs to OUs
+# - add users to groups
+
+Write-Host "AD population skeleton loaded for $domainName"
