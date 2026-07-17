@@ -28,7 +28,7 @@
 
 - name: "Create QCOW2 backing disk"
   ansible.builtin.command: >
-      qemu-img create -f qcow2 -b {{ vm.base_image }}
+      qemu-img create -f qcow2 -F qcow2 -b {{ playbook_dir }}/{{ vm.base_image }}
       /var/lib/libvirt/images/{{ vm.name }}/{{ vm.name }}.qcow2
   args:
       creates: "/var/lib/libvirt/images/{{ vm.name }}/{{ vm.name }}.qcow2"
@@ -39,10 +39,22 @@
       dest: "/tmp/{{ vm.name }}.xml"
       mode: "0644"
 
+- name: "Check if VM exists"
+  ansible.builtin.command: "virsh dominfo {{ vm.name }}"
+  register: vm_check
+  failed_when: false
+  changed_when: false
+
 - name: "Define Linux VM in libvirt"
   ansible.builtin.command: >
       virsh define /tmp/{{ vm.name }}.xml
+  when: vm_check.rc != 0
 
 - name: "Start Linux VM"
   ansible.builtin.command: >
       virsh start {{ vm.name }}
+  register: virsh_start
+  failed_when:
+    - virsh_start.rc != 0
+    - "'already active' not in virsh_start.stderr"
+  changed_when: virsh_start.rc == 0

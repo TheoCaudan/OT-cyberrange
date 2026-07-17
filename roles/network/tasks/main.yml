@@ -22,8 +22,8 @@
 
 - name: "Autostart libvirt networks"
   community.libvirt.virt_net:
-      command: autostart
       name: "{{ item.name }}"
+      autostart: "{{ item.autostart | default(true) | bool }}"
       uri: "{{ libvirt_uri }}"
   loop: "{{ networks }}"
 

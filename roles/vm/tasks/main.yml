@@ -16,7 +16,7 @@
 
 - name: "Fail if a base image is missing"
   ansible.builtin.fail:
-      msg: "Missing base image: {{ item.item.base_image }}"
+      msg: "Missing base image: {{ vm.base_image }}"
   when: not item.stat.exists
   loop: "{{ base_images.results }}"
   loop_control:

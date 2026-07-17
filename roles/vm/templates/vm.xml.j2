@@ -4,7 +4,9 @@
   <vcpu>{{ vm.cpu }}</vcpu>
 
   <os>
-    <type arch="x86_64" machine="pc">hvm</type>
+    <type arch="x86_64" machine="pc-q35-6.2">hvm</type>
+    <loader readonly="yes" type="pflash">/usr/share/edk2/ovmf/OVMF_CODE.fd</loader>
+    <nvram template="/usr/share/edk2/ovmf/OVMF_VARS.fd">/var/lib/libvirt/qemu/nvram/{{ vm.name }}_VARS.fd</nvram>
     {% if vm.os_family | default("linux") == "windows" %}
     <boot dev="cdrom"/>
     <boot dev="hd"/>
@@ -12,6 +14,14 @@
     <boot dev="hd"/>
     {% endif %}
   </os>
+
+  <features>
+    <acpi/>
+    <apic/>
+    {% if vm.firmware | default('bios') == 'uefi' %}
+    <smm/>
+    {% endif %}
+  </features>
 
   <devices>
     <disk type="file" device="disk">
@@ -32,8 +42,8 @@
     {% if vm.os_family | default("linux") == "windows" %}
     <disk type="file" device="cdrom">
       <driver name="qemu" type="raw"/>
-      <source file="{{ vm.base_image }}"/>
-      <target dev="hdc" bus="ide"/>
+      <source file="{{ playbook_dir }}/{{ vm.base_image }}"/>
+      <target dev="sda" bus="sata"/>
       <readonly/>
     </disk>
     {% endif %}

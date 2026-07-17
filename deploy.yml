@@ -16,6 +16,7 @@
         uri: "{{ libvirt_uri }}"
       loop: "{{ vms }}"
       ignore_errors: true
+      when: force_redeploy | default(false)
 
     - name: "Undefine existing VMs if present"
       community.libvirt.virt:
@@ -24,6 +25,7 @@
         uri: "{{ libvirt_uri }}"
       loop: "{{ vms }}"
       ignore_errors: true
+      when: force_redeploy | default(false)
 
     - name: "Destroy existing networks if present"
       community.libvirt.virt_net:
@@ -32,6 +34,7 @@
         uri: "{{ libvirt_uri }}"
       loop: "{{ networks }}"
       ignore_errors: true
+      when: force_redeploy | default(false)
 
     - name: "Undefine existing networks if present"
       community.libvirt.virt_net:
@@ -40,6 +43,7 @@
         uri: "{{ libvirt_uri }}"
       loop: "{{ networks }}"
       ignore_errors: true
+      when: force_redeploy | default(false)
 
   roles:
     - role: network
