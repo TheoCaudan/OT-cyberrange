@@ -1,0 +1,13 @@
+# Images et ISO
+*.iso
+*.qcow2
+
+# Fichiers temporaires générés par Ansible et Libvirt
+/tmp/*.xml
+*.fd
+.cache/
+.pyc
+
+# Données locales
+iso/
+images/
