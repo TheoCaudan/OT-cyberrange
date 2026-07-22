@@ -8,7 +8,32 @@
     update_cache: true
   when: caldera_docker_enabled | default(true)
 
-- name: "Ensure CALDERA directories exist"
+- name: "Ensure CALDERA user exists and belongs to docker group"
+  ansible.builtin.user:
+    name: "{{ caldera_user }}"
+    group: "{{ caldera_group }}"
+    groups: "docker"
+    append: true
+    shell: /bin/bash
+    create_home: true
+    state: present
+
+- name: "Ensure CALDERA main directory exists"
+  ansible.builtin.file:
+    path: "{{ caldera_dir }}"
+    state: directory
+    owner: "{{ caldera_user }}"
+    group: "{{ caldera_group }}"
+    mode: "0755"
+
+- name: "Clone official CALDERA repository"
+  ansible.builtin.git:
+    repo: 'https://github.com/mitre/caldera.git'
+    dest: "{{ caldera_dir }}"
+    version: "{{ caldera_git_version | default('master') }}"
+    force: false
+
+- name: "Ensure CALDERA sub-directories exist"
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -16,7 +41,6 @@
     group: "{{ caldera_group }}"
     mode: "0755"
   loop:
-    - "{{ caldera_dir }}"
     - "{{ caldera_config_dir }}"
     - "{{ caldera_data_dir }}"
     - "{{ caldera_logs_dir }}"

@@ -17,8 +17,27 @@
     mode: "0644"
   notify: "Restart CALDERA stack"
 
-- name: "Start CALDERA stack"
-  ansible.builtin.command: docker compose up -d
-  args:
-    chdir: "{{ caldera_dir }}"
+- name: "Deploy custom CALDERA local configuration"
+  ansible.builtin.copy:
+    src: "conf/local.yml"
+    dest: "{{ caldera_config_dir }}/local.yml"
+    owner: "{{ caldera_user }}"
+    group: "{{ caldera_group }}"
+    mode: "0644"
+  notify: "Restart CALDERA stack"
+
+- name: "Deploy persistent CALDERA data store"
+  ansible.builtin.copy:
+    src: "data/"
+    dest: "{{ caldera_data_dir }}/"
+    owner: "{{ caldera_user }}"
+    group: "{{ caldera_group }}"
+    mode: "0644"
+
+- name: "Manage CALDERA Docker compose stack"
+  community.docker.docker_compose_v2:
+    project_src: "{{ caldera_dir }}"
+    state: present
+    build: always
   when: caldera_docker_enabled | default(true)
+

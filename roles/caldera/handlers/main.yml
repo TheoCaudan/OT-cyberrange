@@ -1,11 +1,7 @@
 ---
 - name: "Restart CALDERA stack"
-  ansible.builtin.command: docker compose up -d
-  args:
-    chdir: "{{ caldera_dir }}"
+  community.docker.docker_compose_v2:
+    project_src: "{{ caldera_dir }}"
+    state: restarted
+  when: caldera_docker_enabled | default(true)
 
-roles/caldera/templates/caldera.env.j2 :
-
-CALDERA_NAME={{ caldera_name }}
-CALDERA_TIMEZONE={{ caldera_timezone }}
-CALDERA_PORT={{ caldera_port }}

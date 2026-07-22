@@ -1,12 +1,23 @@
 services:
   caldera:
-    image: "{{ caldera_image }}"
-    restart: unless-stopped
-    env_file:
-      - .env
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        TZ: "UTC" # Timezone to use in container
+        VARIANT: "full"
+    image: caldera:latest
+    container_name: caldera
     ports:
-      - "{{ caldera_port }}:8888"
+      - "8888:8888"
+      - "8443:8443"
+      - "7010:7010"
+      - "7011:7011/udp"
+      - "7012:7012"
+      - "8853:8853"
+      - "8022:8022"
+      - "2222:2222"
     volumes:
-      - "{{ caldera_config_dir }}:/app/conf"
-      - "{{ caldera_data_dir }}:/app/data"
-      - "{{ caldera_logs_dir }}:/app/logs"
+      - ./conf/local.yml:/usr/src/app/conf/local.yml
+      - ./data:/usr/src/app/data
+    command: --log DEBUG
