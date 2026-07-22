@@ -7,7 +7,7 @@
       group: "{{ siem_group }}"
       mode: "0644"
   when: siem_enable_wazuh | default(true)
-  notify: "Restart SIEM stack"
+  notify: "Recreate SIEM stack"
 
 - name: "Render Suricata compose file"
   ansible.builtin.template:
@@ -17,7 +17,7 @@
       group: "{{ siem_group }}"
       mode: "0644"
   when: siem_enable_suricata | default(true)
-  notify: "Restart SIEM stack"
+  notify: "Recreate SIEM stack"
 
 - name: "Render Wazuh configuration"
   ansible.builtin.template:
@@ -27,7 +27,7 @@
       group: "{{ siem_group }}"
       mode: "0644"
   when: siem_enable_wazuh | default(true)
-  notify: "Restart SIEM stack"
+  notify: "Recreate SIEM stack"
 
 - name: "Render Suricata configuration"
   ansible.builtin.template:
@@ -37,10 +37,31 @@
       group: "{{ siem_group }}"
       mode: "0644"
   when: siem_enable_suricata | default(true)
-  notify: "Restart SIEM stack"
+  notify: "Recreate SIEM stack"
+
+- name: "Render Suricata community rules"
+  ansible.builtin.template:
+    src: "community.rules.j2"
+    dest: "{{ siem_data_dir }}/suricata/rules/community.rules"
+    owner: "{{ siem_user }}"
+    group: "{{ siem_group }}"
+    mode: "0644"
+  when: siem_enable_suricata | default(true)
+  notify: "Recreate SIEM stack"
+
+- name: "Render Suricata local rules"
+  ansible.builtin.template:
+    src: "local.rules.j2"
+    dest: "{{ siem_data_dir }}/suricata/rules/local.rules"
+    owner: "{{ siem_user }}"
+    group: "{{ siem_group }}"
+    mode: "0644"
+  when: siem_enable_suricata | default(true)
+  notify: "Recreate SIEM stack"
 
 - name: "Start SIEM stack"
-  ansible.builtin.command: docker compose up -d
+  ansible.builtin.command:
+    cmd: docker compose -f docker-compose-wazuh.yml -f docker-compose-suricata.yml up -d
   args:
       chdir: "{{ siem_dir }}"
   when: siem_docker_enabled | default(true)

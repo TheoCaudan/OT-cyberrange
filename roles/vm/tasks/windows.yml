@@ -1,9 +1,25 @@
 ---
-- name: "Create Windows VM directory"
+- name: "Load VM credentials from vault"
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/{{ vm.vault_vars }}"
+  when: vm.vault_vars is defined
+
+- name: "Load extra roles vaults"
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/{{ item.value }}"
+  loop: "{{ vm.extra_vault_vars | default({}) | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  when: vm.extra_vault_vars is defined
+
+- name: "Create Windows VM directory structure"
   ansible.builtin.file:
-      path: "/var/lib/libvirt/images/{{ vm.name }}"
-      state: directory
-      mode: "0755"
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "/var/lib/libvirt/images/{{ vm.name }}"
+    - "/var/lib/libvirt/iso/custom"
 
 - name: "Create empty disk for Windows VM"
   ansible.builtin.command: >
@@ -12,6 +28,19 @@
       {{ vm.disk_gb }}G
   args:
       creates: "/var/lib/libvirt/images/{{ vm.name }}/{{ vm.name }}.qcow2"
+
+- name: "Generate autounattend.xml file"
+  ansible.builtin.template:
+    src: "autounattend.xml.j2"
+    dest: "/var/lib/libvirt/iso/custom/autounattend.xml"
+
+- name: "Create clean floppy image for autounattend"
+  ansible.builtin.shell: |
+    rm -f /var/lib/libvirt/iso/custom/autounattend.img
+    mkfs.vfat -C /var/lib/libvirt/iso/custom/autounattend.img 1440
+    mcopy -i /var/lib/libvirt/iso/custom/autounattend.img /var/lib/libvirt/iso/custom/autounattend.xml ::/autounattend.xml
+  args:
+    executable: /bin/bash
 
 - name: "Render Windows VM XML"
   ansible.builtin.template:
@@ -22,7 +51,47 @@
 - name: "Define Windows VM in libvirt"
   ansible.builtin.command: >
       virsh define /tmp/{{ vm.name }}.xml
+  register: virsh_define_win
+  failed_when:
+    - virsh_define_win.rc != 0
+    - "'already exists' not in virsh_define_win.stderr"
+  changed_when: virsh_define_win.rc == 0
 
 - name: "Start Windows VM"
   ansible.builtin.command: >
       virsh start {{ vm.name }}
+
+- name: "Wait for BIOS boot prompt to appear"
+  ansible.builtin.pause:
+    seconds: 5
+
+- name: "Send keypress to bypass Press any key prompt"
+  ansible.builtin.command: >
+    virsh send-key {{ vm.name }} KEY_SPACE
+
+- name: "Wait for WinRM port to be open"
+  ansible.builtin.wait_for:
+    host: "localhost"
+    port: 5985
+    delay: 30
+    timeout: 1800
+    state: started
+
+- name: "Wait for WinRM to be available"
+  ansible.builtin.win_ping:
+  register: winrm_ready
+  until: winrm_ready is success
+  retries: 15
+  delay: 10
+  become: false
+  vars:
+    ansible_user: "Administrator"
+    ansible_password: "{{ vm_password }}"
+    ansible_connection: "winrm"
+    ansible_winrm_server_cert_validation: "ignore"
+    ansible_winrm_transport: "basic"
+    ansible_port: 5985
+
+- name: "Setup Domain controller"
+  ansible.builtin.include_role:
+    name: ad_ds_role

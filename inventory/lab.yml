@@ -3,6 +3,27 @@ all:
     localhost:
       ansible_connection: local
       ansible_python_interpreter: /usr/bin/python3
+  children:
+    linux_vms:
+      hosts:
+        bastion:
+        caldera:
+        scada:
+        plc:
+        siem-ids:
+        client-ad:
+      vars:
+        ansible_user: "{{ vm_user }}"
+        ansible_password: "{{ vm_password }}"
+    windows_vms:
+      hosts:
+        dc:
+      vars:
+        ansible_user: Administrator
+        ansible_password: "{{ vm_password }}"
+        ansible_connection: winrm
+        ansible_winrm_transport: basic
+        ansible_winrm_server_cert_validation: ignore
   vars:
     libvirt_uri: "qemu:///system"
     libvirt_connection: "system"

@@ -1,20 +1,22 @@
 ---
-siem_name: "siem-ids"
-siem_timezone: "UTC"
 siem_docker_enabled: true
-
-siem_dir: "/opt/siem"
-siem_config_dir: "/opt/siem/config"
-siem_data_dir: "/opt/siem/data"
-
-siem_user: "root"
-siem_group: "root"
-
 siem_enable_wazuh: true
 siem_enable_suricata: true
 
-siem_wazuh_listen_port: 1514
-siem_wazuh_api_port: 55000
-siem_wazuh_ui_port: 5601
+siem_user: root
+siem_group: root
 
-siem_suricata_listen_interface: "dmz"
+siem_dir: /opt/siem-ids
+siem_config_dir: /opt/siem-ids/config
+siem_data_dir: /opt/siem-ids/data
+siem_certs_dir: /opt/siem-ids/config/wazuh_indexer_ssl_certs
+
+siem_wazuh_image: wazuh/wazuh:4.14.6
+siem_wazuh_api_port: 55000
+siem_wazuh_ui_port: 443
+
+siem_suricata_image: jasonish/suricata:latest
+siem_suricata_listen_interface: eth0
+
+siem_home_nets:
+  - "any"

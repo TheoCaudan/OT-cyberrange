@@ -3,15 +3,36 @@ hostname: {{ vm.hostname | default(vm.name) }}
 manage_etc_hosts: true
 
 users:
-  - name: {{ vm.admin_user | default("admin") }}
+  - name: root
+    lock_passwd: false
+    passwd: "{{ vm_password_hash }}"
+  - name: ## vm_user }}
     groups: sudo
     shell: /bin/bash
     sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+    lock_passwd: false
+    passwd: "{{ vm_password_hash }}"
+
+chpasswd:
+  expire: false
+
+ssh_pwauth: true
 
 ssh_authorized_keys:
 {% for key in vm.ssh_authorized_keys | default([]) %}
   - {{ key }}
 {% endfor %}
 
+runcmd:
+  - systemctl enable --now serial-getty@ttyS0.service
+  - sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="console=tty0 console=ttyS0,115200n8"/' /etc/default/grub
+  - update-grub
+  - sed -i 's|^({{ vm_user }}:[^:]*:).*|\1{{ vm_password_hash | regex_escape }}:|' /etc/shadow
+
 package_update: true
 package_upgrade: true
+
+locale: fr_FR.UTF-8
+keyboard:
+  layout: fr
+  variant: latin9

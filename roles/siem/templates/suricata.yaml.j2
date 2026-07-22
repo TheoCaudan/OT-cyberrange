@@ -1,6 +1,29 @@
 vars:
   address-groups:
     HOME_NET:
-{% for net in siem_home_nets %}
+{% for net in siem_home_nets | default([]) %}
       - "{{ net }}"
 {% endfor %}
+
+default-rule-path: /var/lib/suricata/rules
+rule-files:
+  - suricata.rules
+  - local.rules
+  - community.rules
+
+outputs:
+  - eve-log:
+      enabled: yes
+      filename: eve.json
+      types:
+        - alert
+        - dns
+        - http
+        - tls
+        - files
+
+af-packet:
+  - interface: {{ siem_suricata_capture_interface }}
+    cluster-id: 99
+    cluster-type: cluster_flow
+    defrag: yes

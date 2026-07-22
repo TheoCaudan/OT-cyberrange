@@ -1,2 +1,8 @@
-mdpred:
-mdpblue:
+caldera_red_user: "change-me"
+caldera_red_password: "change-me"
+
+caldera_blue_user: "change-me"
+caldera_blue_password: "change-me"
+
+caldera_admin_user: "change-me"
+caldera_admin_password: "change-me"

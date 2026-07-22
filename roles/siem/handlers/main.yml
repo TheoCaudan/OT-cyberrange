@@ -1,5 +1,6 @@
 ---
-- name: "Restart SIEM stack"
-  ansible.builtin.command: docker compose up -d
+- name: "Recreate SIEM stack"
+  ansible.builtin.command:
+    cmd: docker compose -f docker-compose-wazuh.yml -f docker-compose-suricata.yml up -d
   args:
       chdir: "{{ siem_dir }}"

@@ -3,47 +3,56 @@
   <memory unit="MiB">{{ vm.ram_mb }}</memory>
   <vcpu>{{ vm.cpu }}</vcpu>
 
-  <os>
+  <os firmware='efi'>
     <type arch="x86_64" machine="pc-q35-6.2">hvm</type>
-    <loader readonly="yes" type="pflash">/usr/share/edk2/ovmf/OVMF_CODE.fd</loader>
-    <nvram template="/usr/share/edk2/ovmf/OVMF_VARS.fd">/var/lib/libvirt/qemu/nvram/{{ vm.name }}_VARS.fd</nvram>
-    {% if vm.os_family | default("linux") == "windows" %}
-    <boot dev="cdrom"/>
-    <boot dev="hd"/>
-    {% else %}
-    <boot dev="hd"/>
-    {% endif %}
+    <firmware>
+      <feature enabled='no' name='enrolled-keys'/>
+      <feature enabled='no' name='secure-boot'/>
+    </firmware>
+    <loader readonly="yes" type="pflash" format='raw'>/usr/share/edk2/x64/OVMF_CODE.4m.fd</loader>
+    <nvram template='/usr/share/edk2/x64/OVMF_VARS.4m.fd'>/var/lib/libvirt/qemu/nvram/{{ vm.name }}_VARS.fd</nvram>
+    <boot dev='hd'/>
+    <boot dev='cdrom'/>
   </os>
 
   <features>
     <acpi/>
     <apic/>
-    {% if vm.firmware | default('bios') == 'uefi' %}
-    <smm/>
-    {% endif %}
+    <smm state='on'/>
   </features>
 
   <devices>
+    <emulator>/usr/bin/qemu-system-x86_64</emulator>
+    <controller type='usb' index='0' model='qemu-xhci'/>
+    <controller type='sata' index='0'/>
+    <controller type='fdc' index='0'/>
+    <controller type='pci' index='0' model='pcie-root'/>
+
     <disk type="file" device="disk">
       <driver name="qemu" type="qcow2"/>
       <source file="/var/lib/libvirt/images/{{ vm.name }}/{{ vm.name }}.qcow2"/>
+      {% if vm.os_family | default("linux") == "linux" %}
       <target dev="vda" bus="virtio"/>
+      {% else %}
+      <target dev="sdc" bus="sata"/>
+      {% endif %}
     </disk>
-
-    {% if vm.os_family | default("linux") == "linux" %}
-    <disk type="file" device="cdrom">
-      <driver name="qemu" type="raw"/>
-      <source file="/var/lib/libvirt/images/{{ vm.name }}/seed.iso"/>
-      <target dev="hdb" bus="ide"/>
-      <readonly/>
-    </disk>
-    {% endif %}
 
     {% if vm.os_family | default("linux") == "windows" %}
     <disk type="file" device="cdrom">
       <driver name="qemu" type="raw"/>
-      <source file="{{ playbook_dir }}/{{ vm.base_image }}"/>
+      <source file="/var/lib/libvirt/iso/windows-server-2022.iso"/>
       <target dev="sda" bus="sata"/>
+    </disk>
+    <disk type="file" device="floppy">
+      <driver name="qemu" type="raw"/>
+      <source file="/var/lib/libvirt/iso/custom/autounattend.img"/>
+      <target dev="fda" bus="fdc"/>
+    </disk>
+    <disk type="file" device="cdrom">
+      <driver name="qemu" type="raw"/>
+      <source file="/var/lib/libvirt/iso/virtio-win.iso"/>
+      <target dev="sdb" bus="sata"/>
       <readonly/>
     </disk>
     {% endif %}
@@ -55,7 +64,20 @@
     </interface>
     {% endfor %}
 
-    <graphics type="vnc" port="-1" autoport="yes"/>
-    <console type="pty"/>
+    <graphics type="vnc" port="-1" autoport="yes" listen="127.0.0.1">
+      <listen type="address" address="127.0.0.1"/>
+    </graphics>
+    <video>
+      <model type='qxl'/>
+    </video>
+
+    <serial type='pty'>
+      <target type='isa-serial' port='0'>
+        <model name='isa-serial'/>
+      </target>
+    </serial>
+    <console type="pty">
+      <target type='serial' port='0'/>
+    </console>
   </devices>
 </domain>

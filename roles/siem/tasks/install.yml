@@ -19,3 +19,7 @@
       - "{{ siem_dir }}"
       - "{{ siem_config_dir }}"
       - "{{ siem_data_dir }}"
+      - "{{ siem_config_dir }}/wazuh_dashboard"
+      - "{{ siem_config_dir }}/wazuh_indexer_ssl_certs"
+      - "{{ siem_data_dir }}/suricata/logs"
+      - "{{ siem_data_dir }}/suricata/rules"

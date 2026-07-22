@@ -1,3 +1,9 @@
+vm_uefi_loader: "/usr/share/edk2/x64/OVMF_CODE.4m.fd" #  !! Change for the one on your host, to know which one :
+# find /usr/share -type f $-name 'OVMF_CODE*.fd' -o -name 'OVMF_VARS*.fd'$ 2>/dev/null
+
+vm_uefi_nvram_dir: "/var/lib/libvirt/qemu/nvram" # !! Same thing here, it can change from host to host check with : 
+# find /var/lib/libvirt -type f -o -type d | grep nvram
+
 vms:
     - name: "fw-it-dmz"
       role: "firewall"
@@ -9,6 +15,7 @@ vms:
       os_family: "linux"
       base_image: "images/debian-genericcloud.qcow2"
       role_vars: "vars/firewall-it-dmz.yml"
+      vault_vars: "host_vars/fw-it-dmz/vault.yml"
       networks:
           - "it"
           - "dmz"
@@ -23,6 +30,7 @@ vms:
       os_family: "linux"
       base_image: "images/debian-genericcloud.qcow2"
       role_vars: "vars/firewall-dmz-otl3.yml"
+      vault_vars: "host_vars/fw-dmz-otl3/vault.yml"
       networks:
           - "dmz"
           - "otl3"
@@ -37,6 +45,7 @@ vms:
       os_family: "linux"
       base_image: "images/debian-genericcloud.qcow2"
       role_vars: "vars/firewall-otl3-otl2.yml"
+      vault_vars: "host_vars/fw-otl3-otl2/vault.yml"
       networks:
           - "otl3"
           - "otl2"
@@ -51,6 +60,7 @@ vms:
       os_family: "linux"
       base_image: "images/debian-genericcloud.qcow2"
       role_vars: "vars/siem.yml"
+      vault_vars: "host_vars/siem-ids/vault.yml"
       networks:
           - "dmz"
 
@@ -63,8 +73,9 @@ vms:
       type: "iso"
       os_family: "windows"
       firmware: "uefi"
-      base_image: "iso/windows-server-2022.iso"
+      base_image: "/var/lib/libvirt/iso/windows-server-2022.iso"
       role_vars: "vars/ad-dc.yml"
+      vault_vars: "host_vars/dc/vault.yml"
       networks:
           - "it"
 
@@ -78,10 +89,13 @@ vms:
       os_family: "linux"
       base_image: "images/debian-genericcloud.qcow2"
       role_vars: "vars/ad-client.yml"
+      vault_vars: "host_vars/client-ad/vault.yml"
       extra_roles:
         - "caldera"
       extra_role_vars:
         caldera: "vars/caldera.yml"
+      extra_vault_vars:
+        caldera: "host_vars/caldera/vault.yml"
       networks:
         - "it"
 
@@ -95,6 +109,7 @@ vms:
       os_family: "linux"
       base_image: "images/debian-genericcloud.qcow2"
       role_vars: "vars/bastion.yml"
+      vault_vars: "host_vars/bastion/vault.yml"
       networks:
           - "dmz"
 
@@ -108,6 +123,7 @@ vms:
       os_family: "linux"
       base_image: "images/debian-genericcloud.qcow2"
       role_vars: "vars/scada.yml"
+      vault_vars: "host_vars/scada/vault.yml"
       networks:
           - "otl3"
 
@@ -121,5 +137,6 @@ vms:
       os_family: "linux"
       base_image: "images/debian-genericcloud.qcow2"
       role_vars: "vars/plc.yml"
+      vault_vars: "host_vars/plc/vault.yml"
       networks:
           - "otl2"

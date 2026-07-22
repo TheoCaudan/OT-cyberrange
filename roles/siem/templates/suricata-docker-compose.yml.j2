@@ -1,6 +1,13 @@
 services:
   suricata:
-    image: "{{ siem_suricata_image | default('jasonish/suricata') }}"
+    image: "{{ siem_suricata_image | default('jasonish/suricata:latest') }}"
     restart: unless-stopped
     network_mode: host
-    command: ["-i", "{{ siem_suricata_listen_interface }}"]
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    command: ["-i", "{{ siem_suricata_capture_interface }}"]
+    volumes:
+      - "{{ siem_config_dir }}/suricata.yaml:/etc/suricata/suricata.yaml:ro"
+      - "{{ siem_data_dir }}/suricata/logs:/var/log/suricata"
+      - "{{ siem_data_dir }}/suricata/rules:/var/lib/suricata/rules"

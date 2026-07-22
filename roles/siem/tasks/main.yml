@@ -1,6 +1,11 @@
 ---
+- name: "Load SIEM config"
+  ansible.builtin.include_vars:
+    file: "{{ role_path }}/vars/siem.yml"
+    
 - name: "Install SIEM dependencies"
   ansible.builtin.import_tasks: "install.yml"
 
 - name: "Deploy SIEM stack"
   ansible.builtin.import_tasks: "deploy.yml"
+

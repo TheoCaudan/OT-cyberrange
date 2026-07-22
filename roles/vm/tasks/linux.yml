@@ -1,4 +1,22 @@
 ---
+- name: "Load VM credentials from vault"
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/{{ vm.vault_vars }}"
+  when: vm.vault_vars is defined
+  
+- name: "Load extra roles vaults"
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/{{ item.value }}"
+  loop: "{{ vm.extra_vault_vars | default({}) | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  when: vm.extra_vault_vars | default({}) | length > 0
+  
+- name: "Uniform template variables"
+  ansible.builtin.set_fact:
+    vm_password_hash: "{{ vm_password_hash | default(vm_password | password_hash('sha512', 'mysecretsalt')) }}"
+    vm_user: "{{ vm_user | default('debian') }}"
+
 - name: "Create Linux VM directory"
   ansible.builtin.file:
       path: "/var/lib/libvirt/images/{{ vm.name }}"
@@ -33,11 +51,78 @@
   args:
       creates: "/var/lib/libvirt/images/{{ vm.name }}/{{ vm.name }}.qcow2"
 
+- name: "Mount VM disk via NBD to inject standard user password"
+  become: true
+  block:
+    - name: "Ensure nbd module is loaded"
+      ansible.builtin.modprobe:
+        name: nbd
+        params: max_part=8
+
+    - name: "Connect QCOW2 image to nbd0"
+      ansible.builtin.command: "qemu-nbd --connect=/dev/nbd0 /var/lib/libvirt/images/{{ vm.name }}/{{ vm.name }}.qcow2"
+      changed_when: true
+
+    - name: "Create temporary mount point"
+      ansible.builtin.file:
+        path: "/tmp/mnt-{{ vm.name }}"
+        state: directory
+        mode: "0755"
+
+    - name: "Mount partition 1 of the VM disk"
+      ansible.builtin.command: "mount /dev/nbd0p1 /tmp/mnt-{{ vm.name }}"
+      changed_when: true
+
+    - name: "Inject standard user password into shadow"
+      ansible.builtin.lineinfile:
+        path: "/tmp/mnt-{{ vm.name }}/etc/shadow"
+        regexp: '^{{ vm_user }}:'
+        line: "{{ vm_user }}:{{ vm_password_hash }}:20640:0:99999:7:::"
+
+    - name: "Ensure group exists in passwd/group if needed"
+      ansible.builtin.lineinfile:
+        path: "/tmp/mnt-{{ vm.name }}/etc/group"
+        regexp: '^{{ vm_user }}:'
+        line: "{{ vm_user }}:x:1000:"
+
+    - name: "Ensure user exists in passwd"
+      ansible.builtin.lineinfile:
+        path: "/tmp/mnt-{{ vm.name }}/etc/passwd"
+        regexp: '^{{ vm_user }}:'
+        line: "{{ vm_user }}:x:1000:1000::/home/{{ vm_user }}:/bin/bash"
+
+    - name: "Ensure user home directory exists"
+      ansible.builtin.file:
+        path: "/tmp/mnt-{{ vm.name }}/home/{{ vm_user }}"
+        state: directory
+        owner: "1000"
+        group: "1000"
+        mode: "0755"
+
+    - name: "Add user to sudoers (whell/sudo group)"
+      ansible.builtin.lineinfile:
+        path: "/tmp/mnt-{{ vm.name }}/etc/group"
+        regexp: '^sudo:.*'
+        line: "sudo:x:27:root,{{ vm_user }}"
+
+    - name: "Unmount VM disk"
+      ansible.builtin.command: "umount /tmp/mnt-{{ vm.name }}"
+      changed_when: true
+
+    - name: "Disconnect nbd0"
+      ansible.builtin.command: "qemu-nbd --disconnect /dev/nbd0"
+      changed_when: true
+  rescue:
+    - name: "Ensure cleanup happens if something fails"
+      ansible.builtin.command: "umount /tmp/mnt-{{ vm.name }} || true"
+    - name: "Ensure nbd disconnects if something fails"
+      ansible.builtin.command: "qemu-nbd --disconnect /dev/nbd0 || true"
+
 - name: "Render Linux VM XML"
   ansible.builtin.template:
-      src: "vm.xml.j2"
-      dest: "/tmp/{{ vm.name }}.xml"
-      mode: "0644"
+    src: "vm.xml.j2"
+    dest: "/tmp/{{ vm.name }}.xml"
+    mode: "0644"
 
 - name: "Check if VM exists"
   ansible.builtin.command: "virsh dominfo {{ vm.name }}"
